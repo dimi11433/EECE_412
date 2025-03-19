@@ -30,7 +30,7 @@ begin
                 when others =>
                     x <= "0";
                     y <= "0000";
-            end case
+            end case;
     end process;
 end rtl;
 
