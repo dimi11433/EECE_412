@@ -28,7 +28,7 @@ begin
                     x <= d;
                     y <= "1000";
                 when others =>
-                    x <= "0";
+                    x <= '0';
                     y <= "0000";
             end case;
     end process;
