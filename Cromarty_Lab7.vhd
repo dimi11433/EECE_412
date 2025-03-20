@@ -7,7 +7,7 @@ entity selected_stmt_mux_dec is
         s: in std_logic_vector(1 downto 0);
         a, b, c, d: in std_logic;
         x: out std_logic;
-        y: out std_logic_vector(3 down to 0)
+        y: out std_logic_vector(3 downto 0)
     );
 end selected_stmt_mux_dec;
 architecture rtl of selected_stmt_mux_dec is 
