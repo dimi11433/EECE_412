@@ -17,7 +17,7 @@ architecture rtl of selected_stmt_mux_dec is
              b when "01",
              c when "10",
              d when "11",
-             "0" when others;
+             '0' when others;
 
     with s select
         y <= "0001" when "00",
