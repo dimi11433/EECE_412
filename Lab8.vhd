@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity nested_if_max is
     Port(
         a, b, c: in std_logic_vector(1 downto 0)
-        max: in std_logic_vector(1 downto 0)
+        max: out std_logic_vector(1 downto 0)
     );
 end nested_if_max;
 
@@ -19,17 +19,19 @@ architecture rtl of nested_if_max is
         uc <= unsigned(c);
 
         process(ua, ub, uc)
+            begin
+            umax <= ua;
             if(ua > ub) then
                 if(ua > uc) then
-                    max <= ua;
+                    umax <= ua;
                 else 
-                    max <= uc;
+                    umax <= uc;
                 end if;
             else
                 if(ub > uc) then 
-                    max <= ub;
+                    umax <= ub;
                 else 
-                    max <= uc;
+                    umax <= uc;
                 end if;
             end if;
         end process;
