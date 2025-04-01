@@ -23,7 +23,7 @@ architecture rtl of prior_encoder_if_stmts is
             elsif(r(1) == '1')then --checks if third highest bit is equal to 1
                 code <= "01"; --If yes set code to 01 and active to 1
                 active <= '1';
-            elsif(r(0) == '1')then--checks if the last bit is equal to 1
+            elsif (r(0) == '1')then--checks if the last bit is equal to 1
                 code <= "00"; --If yes set code to 00 and active to 1
                 active <= '1';
             else
