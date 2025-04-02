@@ -30,5 +30,5 @@ architecture rtl of prior_encoder_if_stmts is
                 code <= "00"; --set code to 00 and active to 0 if anyother case
                 active <= '0';
             end if;
-        end process
+        end process;
 end rtl;
