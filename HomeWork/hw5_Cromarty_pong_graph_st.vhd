@@ -209,7 +209,19 @@ begin
     ball_rgb <= "100"; -- red
 
     --now we need to do the same for the triangle
+    rom_trig_addr <= pix_y(4 downto 0) - triangle_y_t(4 downto 0); -- ROM row
     
+    rom_trig_col <= pix_x(4 downto 0) - triangle_x_l(4 downto 0); --ROM coloumn
+
+    rom_trig_data <= TRIANGLE_ROM(to_integer(rom_trig_addr));
+
+    rom_trig_bit <= rom_trig_data(to_integer(rom_trig_col));
+
+    trig_on <= '1' when (ra_trig_on = '1') and 
+        (rom_trig_bit = '1') else
+     '0';
+    trig_rgb <= "100";
+
     -- Update the ball position 60 times per second.
     ball_x_next <= ball_x_reg + x_delta_reg when
         refr_tick = '1' else
@@ -217,6 +229,13 @@ begin
     ball_y_next <= ball_y_reg + y_delta_reg when
         refr_tick = '1' else
         ball_y_reg;
+    --Update the triangle position 60 times per second.
+    triangle_x_next <= triangle_x_reg + x_trig_delta_reg when
+        refr_tick = '1' else
+        triangle_x_reg;
+    triangle_y_next <= triangle_y_reg + y_trig_delta_reg when
+        refr_tick = '1' else
+        triangle_y_reg;
     -- Set the value of the next ball position according to
     -- the boundaries.
     process (x_delta_reg, y_delta_reg, ball_y_t, ball_x_l,
