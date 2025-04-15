@@ -45,15 +45,15 @@ architecture sq_ball_arch of pong_graph_st is
     signal ball_x_l, ball_x_r : unsigned(9 downto 0);
     signal ball_y_t, ball_y_b : unsigned(9 downto 0);
 
-    signal triangle_x_l, triangle_x_r : unsigned(9 downto 0); --cordinates for the points on the triangle
-    signal triangle_y_t, triangle_y_b : unsigned(9 downto 0);
-
+    signal triangle_x_l, triangle_x_r : unsigned(9 downto 0); --cordinates for the sides of the triangle
+    signal triangle_y_t, triangle_y_b : unsigned(9 downto 0)
     -- reg to track left and top boundary
     signal ball_x_reg, ball_x_next : unsigned(9 downto 0);
     signal ball_y_reg, ball_y_next : unsigned(9 downto 0);
 
     signal triangle_x_reg, triangle_x_next : unsigned(9 downto 0);
     signal triangle_y_reg, triangle_y_next : unsigned(9 downto 0);
+    
 
     -- reg to track ball speed
     signal x_delta_reg, x_delta_next : unsigned(9 downto 0);
@@ -67,7 +67,7 @@ architecture sq_ball_arch of pong_graph_st is
     constant BALL_V_N : unsigned(9 downto 0) := unsigned(to_signed(-2, 10));
 
     constant TRIANGLE_V_P : unsigned(9 downto 0) := to_unsigned(4, 10);
-    constant BALL_V_N : unsigned(9 downto 0) := unsigned(to_signed(-2, 10));
+    constant TRIANGLE_V_N : unsigned(9 downto 0) := unsigned(to_signed(-2, 10));
     -- round ball image
     type rom_type is array(0 to 7) of std_logic_vector(0 to 7);
     constant BALL_ROM : rom_type := (
@@ -119,8 +119,8 @@ begin
             ball_y_reg <= (others => '0');
             x_delta_reg <= ("0000000100");
             y_delta_reg <= ("0000000100");
-            triangle_y_reg <= (others => '0');
             triangle_x_reg <= (others => '0');
+            triangle_y_reg <= (others => '0');
             x_trig_delta_reg <= ("0000000100");
             y_trig_delta_reg <= ("0000000100");
         elsif (clk'event and clk = '1') then
@@ -129,8 +129,8 @@ begin
             ball_y_reg <= ball_y_next;
             x_delta_reg <= x_delta_next;
             y_delta_reg <= y_delta_next;
-            triangle_y_reg <= triangle_y_next;
-            triangle_x_reg <= triangle_x_next;
+            triangle_x_reg <= triangle_y_next;
+            triangle_y_reg <= triangle_x_next;
             x_trig_delta_reg <= x_trig_delta_next;
             y_trig_delta_reg <= y_trig_delta_next;
         end if;
@@ -175,11 +175,23 @@ begin
     ball_y_t <= ball_y_reg;
     ball_x_r <= ball_x_l + BALL_SIZE - 1;
     ball_y_b <= ball_y_t + BALL_SIZE - 1;
+
+    --set coordinates of triangle.
+    triagnle_x_l <= trigangle_x_reg;
+    triangle_y_t <= triangle_y_reg:;
+    triangle_x_r <= triangle_x_l + TRIANGLE_SIZE - 1;
+    triangle_y_b <= triangle_y_l + TRIANGLE_SIZE - 1;
+
     -- pixel within square ball
     sq_ball_on <= '1' when (ball_x_l <= pix_x) and
         (pix_x <= ball_x_r) and (ball_y_t <= pix_y) and
         (pix_y <= ball_y_b) else
      '0';
+
+    --pixel within square triangle 
+    ra_trig_on <= '1' when (triangle_x_l <= pix_x) and 
+        (pix_x <= triangle_x_r) and (triangle_y_t <= pix_y) and 
+        (pix_y <= triangle_y_b)
     -- map scan coord to ROM addr/col -- use low order three
     -- bits of pixel and ball positions.
     -- ROM row
@@ -195,6 +207,9 @@ begin
         (rom_bit = '1') else
      '0';
     ball_rgb <= "100"; -- red
+
+    --now we need to do the same for the triangle
+    
     -- Update the ball position 60 times per second.
     ball_x_next <= ball_x_reg + x_delta_reg when
         refr_tick = '1' else
