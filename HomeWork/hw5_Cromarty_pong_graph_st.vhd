@@ -262,8 +262,36 @@ begin
             end if;
         end if;
     end process;
+
+    process (x_trig_delta_reg, y_trig_delta_reg, triangle_y_t, triangle_x_l,
+        triangle_x_r, triangle_y_b, bar_y_t, bar_y_b)
+    begin
+        x_trig_delta_next <= x_trig_delta_reg;
+        y_trig_delta_next <= y_trig_delta_reg;
+        -- triangle reached top, make offset positive
+        if (triangle_y_t < 1) then
+            y_trig_delta_next <= TRIANGLE_V_P;
+            -- reached bottom, make negative
+        elsif (triangle_y_b > (MAX_Y - 1)) then
+            y_trig_delta_next <= TRIANGLE_V_N;
+            -- reach wall, bounce back
+        elsif (triangle_x_l <= WALL_X_R) then
+            x_trig_delta_next <= TRIANGLE_V_P;
+            -- right corner of ball inside bar
+        elsif ((BAR_X_L <= triangle_x_r) and
+            (triangle_x_r <= BAR_X_R)) then
+            -- some portion of ball hitting paddle, reverse dir
+            if ((bar_y_t <= triangle_y_b) and
+                (triangle_y_t <= bar_y_b)) then
+                x_trig_delta_next <= TRIANGLE_V_N;
+            end if;
+        end if;
+    end process;
+
+
+
     process (video_on, wall_on, bar_on, rd_ball_on,
-        wall_rgb, bar_rgb, ball_rgb)
+        wall_rgb, bar_rgb, ball_rgb, trig_on, trig_rgb)
     begin
         if (video_on = '0') then
             graph_rgb <= "000"; -- blank
@@ -274,6 +302,8 @@ begin
                 graph_rgb <= bar_rgb;
             elsif (rd_ball_on = '1') then
                 graph_rgb <= ball_rgb;
+            elsif (trig_on = '1')then
+                graph_rgb <= trig_rgb;
             else
                 graph_rgb <= "110"; -- yellow bkgnd
             end if;
