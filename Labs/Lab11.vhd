@@ -126,9 +126,10 @@ begin
                 -- if btn 0 pressed and bar not at top yet
             elsif (btn(0) = '0' and bar_y_t > BAR_V) then
                 bar_y_next <= bar_y_reg - BAR_V;
-                --if butn 3 is pressed and bar is at right most
+                --if butn 3 is pressed and bar is not at right most
             elsif (btn(3) = '0' and bar_x_r < (MAX_X - 1 - BAR_V)) then
                 bar_x_next <= bar_x_reg - BAR_V;
+                --if button 2 is pressed and bar is not at left most
             elsif (btn(2) = '0' and bar_x_l > BAR_V) then
                 bar_x_next <= bar_x_reg + BAR_V;
             end if;
