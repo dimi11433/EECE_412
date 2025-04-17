@@ -29,10 +29,8 @@ architecture sq_ball_arch of pong_graph_st is
     -- allow movement. bar_y_t driven by reg below.
     constant BAR_X_L : integer := 600;
     constant BAR_X_R : integer := 603;
-
     signal bar_y_t, bar_y_b : unsigned(9 downto 0);
     signal bar_x_l, bar_y_r : unsigned(9 downto 0);
-    
     constant BAR_Y_SIZE : integer := 72;
     constant BAR_X_SIZE : integer := 3;
     -- reg to track top boundary and bottom (x position is  notfixed)
@@ -41,6 +39,7 @@ architecture sq_ball_arch of pong_graph_st is
     -- bar moving velocity when a button is pressed
     -- the amount the bar is moved.
     constant BAR_V : integer := 4;
+    
     -- square ball -- ball left, right, top and bottom
     -- all vary. Left and top driven by registers below.
     constant BALL_SIZE : integer := 8;
@@ -78,8 +77,10 @@ begin
     process (clk, reset)
     begin
         if (reset = '1') then
-            bar_y_reg <= (others => '0');
-            bar_x_reg <= (others => '0');
+            bar_x_reg <= to_unsigned(MAX_X - BAR_X_SIZE - 1, 10);
+            bar_y_reg <= to_unsigned((MAX_Y - BAR_Y_SIZE)/2,   10);
+            --bar_y_reg <= (others => '0');
+            --bar_x_reg <= (others => '0');
             ball_x_reg <= (others => '0');
             ball_y_reg <= (others => '0');
             x_delta_reg <= ("0000000100");
@@ -116,24 +117,23 @@ begin
         '0';
     bar_rgb <= "010"; -- green
     -- Process bar movement requests
-    process (bar_y_reg, bar_y_b, bar_y_t, bar_x_reg, bar_x_l, bar_x_r,refr_tick, btn)
+    process (bar_y_reg, bar_y_b, bar_y_t, bar_x_reg, bar_x_l, bar_x_r, refr_tick, btn)
     begin
         bar_y_next <= bar_y_reg; -- no move
         bar_x_next <= bar_x_reg;
         if (refr_tick = '1') then
             -- if btn 1 pressed and paddle not at bottom yet
-            if (btn(1) = '0' and bar_y_b <
+            if (btn(1) = '1' and bar_y_b <
                 (MAX_Y - 1 - BAR_V)) then
                 bar_y_next <= bar_y_reg + BAR_V;
                 -- if btn 0 pressed and bar not at top yet
-            elsif (btn(0) = '0' and bar_y_t > BAR_V) then
+            elsif (btn(0) = '1' and bar_y_t > BAR_V) then
                 bar_y_next <= bar_y_reg - BAR_V;
-                --if butn 3 is pressed and bar is not at right most
-            elsif (btn(3) = '0' and bar_x_r < (MAX_X - 1 - BAR_V)) then
-                bar_x_next <= bar_x_reg - BAR_V;
-                --if button 2 is pressed and bar is not at left most
-            elsif (btn(2) = '0' and bar_x_l > BAR_V) then
+                --if butn 3 is pressed and bar is at right most
+            elsif (btn(3) = '1') and (bar_x_r < MAX_X -1 - BAR_V)  then
                 bar_x_next <= bar_x_reg + BAR_V;
+            elsif (btn(2) = '1') and (bar_x_l > BAR_V) then
+                bar_x_next <= bar_x_reg - BAR_V;
             end if;
         end if;
     end process;
