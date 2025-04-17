@@ -29,8 +29,10 @@ architecture sq_ball_arch of pong_graph_st is
     -- allow movement. bar_y_t driven by reg below.
     constant BAR_X_L : integer := 600;
     constant BAR_X_R : integer := 603;
+
     signal bar_y_t, bar_y_b : unsigned(9 downto 0);
     signal bar_x_l, bar_y_r : unsigned(9 downto 0);
+    
     constant BAR_Y_SIZE : integer := 72;
     constant BAR_X_SIZE : integer := 3;
     -- reg to track top boundary and bottom (x position is  notfixed)
