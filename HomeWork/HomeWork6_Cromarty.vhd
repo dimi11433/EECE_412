@@ -31,7 +31,7 @@ architecture arch of cnter1or2 is
         begin
             if (rising)then
                 r_reg <= (others => '0');
-            else if (rising_edge(clk)) then
+            elsif (rising_edge(clk)) then
                 r_reg <= r_next;
             end if;
         end process;
