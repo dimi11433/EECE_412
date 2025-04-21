@@ -26,8 +26,6 @@ architecture sq_ball_arch of pong_graph_st is
     -- paddle left, right, top, bottom and height left &
     -- right are constant. top & bottom are signals to
     -- allow movement. spaceship_y_top driven by reg below.
-    constant spaceship_x_start : integer := 600;
-    constant BAR_X_R : integer := 603;
 
     signal spaceship_y_top, spaceship_y_bottom : unsigned(9 downto 0);
     signal spaceship_x_start, spaceship_x_end : unsigned(9 downto 0);
