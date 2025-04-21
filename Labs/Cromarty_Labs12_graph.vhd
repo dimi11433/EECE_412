@@ -40,7 +40,7 @@ architecture sq_ball_arch of pong_graph_st is
     -- bar moving velocity when a button is pressed
     -- the amount the bar is moved.
     constant SPACESHIP_MOVE : integer := 4;
-    constant FIRING_DX : integer: := 4;
+    constant FIRING_DX : integer := 4;
     
     -- square ball -- ball left, right, top and bottom
     -- all vary. Left and top driven by registers below.
