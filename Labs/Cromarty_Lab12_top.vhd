@@ -25,7 +25,7 @@ begin
     -- instantiate pixel generation circuit
     pong_grf_st_unit : entity
         work.pong_graph_st(sq_ball_arch)
-        port map(clk => clk, reset => reset, video_on => video_on, left_btn => btn(0), right_bt => btn(1) , up_btn => btn(2), down_btn => btn(3),  fire_btn => btn(4) , pixel_x => pixel_x, pixel_y => pixel_y, graph_rgb => rgb_next);
+        port map(clk => clk, reset => reset, video_on => video_on, left_btn => btn(0), right_btn => btn(1) , up_btn => btn(2), down_btn => btn(3),  fire_btn => btn(4) , pixel_x => pixel_x, pixel_y => pixel_y, graph_rgb => rgb_next);
     vga_pixel_tick <= p_tick;
     -- Set the high order bits of the video DAC for each
     -- of the three colors
