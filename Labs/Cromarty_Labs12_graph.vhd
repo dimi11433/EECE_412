@@ -174,7 +174,6 @@ begin
         if (reset = '1') then
             spaceship_x_reg <= to_unsigned(MAX_X - SPACESHIP_X_SIZE - 1, 10);
             spaceship_y_reg <= to_unsigned((MAX_Y - SPACESHIP_Y_SIZE)/2,   10);
-            button_pressed <= '0';
         elsif (rising_edge(clk)) then
             spaceship_y_reg <= spaceship_y_next;
             spaceship_x_reg <= spaceship_x_next;
