@@ -54,7 +54,7 @@ architecture sq_ball_arch of pong_graph_st is
     signal ball_y_reg, ball_y_next : unsigned(9 downto 0);
 
     -- spaceship image
-    type rom_type_16 is array(0 to 16) of std_logic_vector(0 to 23);
+    type rom_type_16 is array(0 to 15) of std_logic_vector(0 to 23);
     constant SPACESHIP_ROM : rom_type_16 := (
         "000000000000000000000000",
         "000000000000000111110000",
