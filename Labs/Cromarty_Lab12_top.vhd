@@ -24,7 +24,7 @@ begin
         port map(clk => clk, reset => reset, hsync => hsync, vsync => vsync, comp_sync => comp_sync, video_on => video_on, p_tick => p_tick, pixel_x => pixel_x, pixel_y => pixel_y);
     -- instantiate pixel generation circuit
     pong_grf_st_unit : entity
-        work.pong_graph_st(pong_graph_st)
+        work.pong_graph_st(Behavioral)
         port map(clk => clk, reset => reset, video_on => video_on, left_btn => btn(0), right_btn => btn(1) , up_btn => btn(2), down_btn => btn(3),  fire_btn => btn(4) , pixel_x => pixel_x, pixel_y => pixel_y, rgb_next => rgb_next);
     vga_pixel_tick <= p_tick;
     -- Set the high order bits of the video DAC for each
