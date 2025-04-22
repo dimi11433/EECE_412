@@ -47,37 +47,32 @@ architecture sq_ball_arch of pong_graph_st is
     signal ball_x_l, ball_x_r : unsigned(9 downto 0);
     signal ball_y_t, ball_y_b : unsigned(9 downto 0);
 
+    signal button_pressed : std_logic;
+
     -- reg to track left and top boundary
     signal ball_x_reg, ball_x_next : unsigned(9 downto 0);
     signal ball_y_reg, ball_y_next : unsigned(9 downto 0);
 
     -- spaceship image
-    type rom_type_16 is array(0 to 23) of std_logic_vector(0 to 15);
+    type rom_type_16 is array(0 to 16) of std_logic_vector(0 to 23);
     constant SPACESHIP_ROM : rom_type_16 := (
-        "0000000100000000",
-        "0000001110000000",
-        "0000011111000000",
-        "0000111111100000",
-        "0000111111100000",
-        "0000111111100000",
-        "0001111111110000",
-        "0001111011110000",
-        "0001110001110000",
-        "0001111011110000",
-        "0001111111110000",
-        "0001111111110000",
-        "0001111111110000",
-        "0001111111110000",
-        "0011111111111000",
-        "0111111111111100",
-        "0111111111111100",
-        "0111111111111100",
-        "0111111111111100",
-        "0111111111111100",
-        "0011100000011000",
-        "0011000000011000",
-        "0010000000001000",
-        "0000000000000000"
+        "000000000000000000000000",
+        "000000000000000111110000",
+        "000000000000001111111110",
+        "000000111111111111111100",
+        "000111111111111111111000",
+        "001111111111111111110000",
+        "011111110111111111110000",
+        "111111100011111111110000",
+        "011111110111111111110000",
+        "001111111111111111110000",
+        "000111111111111111110000",
+        "000000111111111111111100",
+        "000000000000001111111110",
+        "000000000000000111110000",
+        "000000000000000000000000",
+        "000000000000000000000000"
+
     );
     -- round ball image
     type rom_type is array(0 to 7) of std_logic_vector(0 to 7);
@@ -99,25 +94,6 @@ architecture sq_ball_arch of pong_graph_st is
     signal spaceship_rgb, ball_rgb : std_logic_vector(2 downto 0);
     -- ====================================================
 begin
-    process (clk, reset)
-    begin
-        if (reset = '1') then
-            spaceship_x_reg <= to_unsigned(MAX_X - SPACESHIP_X_SIZE - 1, 10);
-            spaceship_y_reg <= to_unsigned((MAX_Y - SPACESHIP_Y_SIZE)/2,   10);
-            ball_y_reg <= to_unsigned(MAX_X - SPACESHIP_X_SIZE - 1, 10);
-            ball_x_reg <= to_unsigned((MAX_Y - SPACESHIP_Y_SIZE)/2,   10);
-            --spaceship_y_reg <= (others => '0');
-            --spaceship_x_reg <= (others => '0');
-        elsif (clk'event and clk = '1') then
-            spaceship_y_reg <= spaceship_y_next;
-            spaceship_x_reg <= spaceship_x_next;
-            ball_y_reg <= spaceship_y_next;
-            ball_x_reg <= spaceship_x_next;
-            if(btn(4) = '1')then
-                ball_x_reg <= ball_x_next;
-            end if;
-        end if;
-    end process;
     pix_x <= unsigned(pixel_x);
     pix_y <= unsigned(pixel_y);
     -- refr_tick: 1-clock tick asserted at start of v_sync,
@@ -126,17 +102,18 @@ begin
         else
         '0';
 
-    -- pixel within paddle
+    -- set spaceship bounds
     spaceship_y_top <= spaceship_y_reg;
     spaceship_x_start <= spaceship_x_reg;
     spaceship_y_bottom <= spaceship_y_top + SPACESHIP_Y_SIZE - 1;
     spaceship_x_end <= spaceship_x_start + SPACESHIP_X_SIZE - 1;
+
     spaceship_on <= '1' when (spaceship_x_start <= pix_x) and
         (pix_x <= spaceship_x_end) and (spaceship_y_top <= pix_y) and
         (pix_y <= spaceship_y_bottom) else
         '0';
     spaceship_rgb <= "010"; -- green
-    -- Process bar movement requests
+    -- Process spaceship movement requests
     process (spaceship_y_reg, spaceship_y_bottom, spaceship_y_top, spaceship_x_reg, spaceship_x_start, spaceship_x_end, refr_tick, btn)
     begin
         spaceship_y_next <= spaceship_y_reg; -- no move
@@ -158,14 +135,16 @@ begin
         end if;
     end process;
     -- set coordinates of square ball.
-    ball_x_l <= ball_x_reg;
-    ball_y_t <= ball_y_reg;
+    ball_x_l <= spaceship_x_start;
+    ball_y_t <= spaceship_y_top;
     ball_x_r <= ball_x_l + FIRING_BALL_SIZE - 1;
     ball_y_b <= ball_y_t + FIRING_BALL_SIZE - 1;
     -- pixel within square ball
     sq_ball_on <= '1' when (ball_x_l <= pix_x) and
         (pix_x <= ball_x_r) and (ball_y_t <= pix_y) and
-        (pix_y <= ball_y_b) else
+        (pix_y <= ball_y_b) and (button_pressed = '1') else
+        '0';
+    button_pressed <= '1' when (btn(4) = '1') else
         '0';
     -- map scan coord to ROM addr/col -- use low order three
     -- bits of pixel and ball positions.
@@ -184,13 +163,29 @@ begin
     ball_rgb <= "100"; -- red
     -- Update the ball position 60 times per second.
     ball_x_next <= ball_x_reg + FIRING_DX when
-        refr_tick = '1' else
+        (refr_tick = '1') and (button_pressed = '1') else
         ball_x_reg;
+
     -- Set the value of the next ball position according to
     -- the boundaries.
+
+    process (clk, reset)
+    begin
+        if (reset = '1') then
+            spaceship_x_reg <= to_unsigned(MAX_X - SPACESHIP_X_SIZE - 1, 10);
+            spaceship_y_reg <= to_unsigned((MAX_Y - SPACESHIP_Y_SIZE)/2,   10);
+            button_pressed <= '0';
+        elsif (rising_edge(clk)) then
+            spaceship_y_reg <= spaceship_y_next;
+            spaceship_x_reg <= spaceship_x_next;
+            if(button_pressed = '1' and ball_on = '1') then
+                ball_x_reg <= ball_x_next;
+                ball_y_reg <= ball_y_next;
+            end if;
+        end if;
+    end process;
     
-    process (video_on, wall_on, spaceship_on, rd_ball_on,
-        wall_rgb, spaceship_rgb, ball_rgb)
+    process (video_on, spaceship_on, rd_ball_on, spaceship_rgb, ball_rgb)
     begin
         if (video_on = '0') then
             graph_rgb <= "000"; -- blank
