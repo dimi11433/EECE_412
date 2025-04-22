@@ -142,7 +142,7 @@ begin
     -- pixel within square ball
     sq_ball_on <= '1' when (ball_x_l <= pix_x) and
         (pix_x <= ball_x_r) and (ball_y_t <= pix_y) and
-        (pix_y <= ball_y_b) and (button_pressed = '1') else
+        (pix_y <= ball_y_b)  else
         '0';
     button_pressed <= '1' when (btn(4) = '1') else
         '0';
@@ -158,7 +158,7 @@ begin
     rom_bit <= rom_data(to_integer(rom_col));
     -- Turn ball on only if within square and ROM bit is 1.
     rd_ball_on <= '1' when (sq_ball_on = '1') and
-        (rom_bit = '1') else
+        (rom_bit = '1') and (button_pressed = '1') else
         '0';
     ball_rgb <= "100"; -- red
     -- Update the ball position 60 times per second.
@@ -178,9 +178,8 @@ begin
         elsif (rising_edge(clk)) then
             spaceship_y_reg <= spaceship_y_next;
             spaceship_x_reg <= spaceship_x_next;
-            if(button_pressed = '1' and ball_on = '1') then
+            if(rd_ball_on = '1') then
                 ball_x_reg <= ball_x_next;
-                ball_y_reg <= ball_y_next;
             end if;
         end if;
     end process;
