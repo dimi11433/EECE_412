@@ -169,8 +169,8 @@ begin
   begin
     if missile_on = '1' then
       rgb_next <= "100";  -- Red for missile
-    elsif ball_on = '1' then
-      rgb_next <= "010";  -- Green for ball
+    -- elsif ball_on = '1' then
+    --   rgb_next <= "010";  -- Green for ball
     elsif ship_on = '1' then
       rgb_next <= "001";  -- Blue for spaceship
     else
